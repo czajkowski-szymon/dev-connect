@@ -3,8 +3,15 @@ spring:
     url: jdbc:postgresql://localhost:5432/devconnect
     username: postgres
     password: root
+
   jpa:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
+    hibernate:
+      ddl-auto: update
+
+rsa:
+  public-key: classpath:certs/public.pem
+  private-key: classpath:certs/private.pem
