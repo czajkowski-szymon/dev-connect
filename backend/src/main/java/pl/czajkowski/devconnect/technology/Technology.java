@@ -2,7 +2,6 @@ package pl.czajkowski.devconnect.technology;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import pl.czajkowski.devconnect.user.UserService;
 import pl.czajkowski.devconnect.user.models.User;
 
 import java.util.ArrayList;
@@ -15,6 +14,7 @@ public class Technology {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(nullable = false)
     private String technologyName;
     @JsonIgnore
     @ManyToMany(mappedBy = "technologies")

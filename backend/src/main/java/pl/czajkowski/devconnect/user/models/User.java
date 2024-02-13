@@ -10,14 +10,29 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "user_")
+@Table(
+        name = "user_",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "user_email_unique",
+                        columnNames = "email"
+                ),
+                @UniqueConstraint(
+                        name = "profile_image_id_unique",
+                        columnNames = "profile_image_id"
+                ),
+        }
+)
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(nullable = false)
     private String email;
+    @Column(nullable = false)
     private String password;
+    @Column(nullable = false)
     private String firstName;
     private String githubUrl;
     private String profileImageId;
@@ -28,6 +43,7 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "technology_id")
     )
     private List<Technology> technologies;
+    @Column(nullable = false)
     private Role role;
     private boolean locked;
     private boolean enabled;

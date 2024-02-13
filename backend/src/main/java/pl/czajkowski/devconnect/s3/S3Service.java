@@ -1,6 +1,7 @@
 package pl.czajkowski.devconnect.s3;
 
 import org.springframework.stereotype.Service;
+import pl.czajkowski.devconnect.exception.ResourceNotFoundException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -36,8 +37,7 @@ public class S3Service {
         try {
             return client.getObject(request).readAllBytes();
         } catch (IOException e) {
-            // TODO: custom exception
-            throw new RuntimeException(e);
+            throw new ResourceNotFoundException("image not found");
         }
     }
 }
