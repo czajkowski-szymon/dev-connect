@@ -6,6 +6,7 @@ import pl.czajkowski.devconnect.user.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "technology")
@@ -21,6 +22,11 @@ public class Technology {
     private List<User> users;
 
     public Technology() {}
+
+    public Technology(Integer id, String technologyName) {
+        this.id = id;
+        this.technologyName = technologyName;
+    }
 
     public Integer getId() {
         return id;
@@ -51,5 +57,18 @@ public class Technology {
             users = new ArrayList<>();
         }
         users.add(user);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Technology that = (Technology) o;
+        return Objects.equals(id, that.id) && Objects.equals(technologyName, that.technologyName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, technologyName);
     }
 }

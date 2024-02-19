@@ -29,7 +29,7 @@ public class UserController {
             value = "/{userId}/profile-image",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public void uploadProfileImage(@PathVariable Integer userId, @RequestParam("file")MultipartFile file) {
+    public void uploadProfileImage(@PathVariable Integer userId, @RequestParam("file") MultipartFile file) {
         userService.uploadProfileImage(userId, file);
     }
 

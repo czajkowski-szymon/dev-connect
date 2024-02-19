@@ -37,7 +37,7 @@ public class S3Service {
         try {
             return client.getObject(request).readAllBytes();
         } catch (IOException e) {
-            throw new ResourceNotFoundException("image not found");
+            throw new ResourceNotFoundException("Image not found");
         }
     }
 }

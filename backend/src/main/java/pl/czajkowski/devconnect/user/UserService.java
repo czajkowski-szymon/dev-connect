@@ -40,8 +40,9 @@ public class UserService {
     }
 
     public RegistrationResponse register(RegistrationRequest request) {
-        if (userRepository.findByEmail(request.email()).isPresent()) {
-            throw new EmailAlreadyExistsException("user with given username already exists");
+        boolean emailExists = userRepository.existsUserByEmail(request.email());
+        if (emailExists) {
+            throw new EmailAlreadyExistsException("User with email: " + request.email() + " already exists");
         }
 
         User user = new User(
@@ -58,7 +59,7 @@ public class UserService {
         List<String> technologyNames = request.technologies();
         for (String technologyName : technologyNames) {
             Technology t = technologyRepository.findByTechnologyName(technologyName).orElseThrow(
-                    () -> new ResourceNotFoundException("technology not found")
+                    () -> new ResourceNotFoundException("Technology not found")
             );
             t.addUser(user);
             technologies.add(t);
@@ -70,12 +71,16 @@ public class UserService {
     }
 
     public void uploadProfileImage(Integer userId, MultipartFile file) {
+        if (!userRepository.existsUserById(userId)) {
+            throw new UserNotFoundException("User with id: [%s] not found".formatted(userId));
+        }
+
         String profileImageId = UUID.randomUUID().toString();
 
         try {
             s3.uploadFile("profile-images/%s/%s".formatted(userId, profileImageId), file.getBytes());
         } catch (IOException e) {
-            throw new ResourceNotFoundException("failed to upload profile image");
+            throw new ResourceNotFoundException("Failed to upload profile image");
         }
 
         userRepository.updateProfileImageId(profileImageId, userId);
@@ -83,7 +88,7 @@ public class UserService {
 
     public byte[] downloadProfileImage(Integer userId) {
         UserDTO user = userRepository.findById(userId).map(mapper).orElseThrow(
-                () -> new UserNotFoundException("user with id: [%s] not found".formatted(userId))
+                () -> new UserNotFoundException("User with id: [%s] not found".formatted(userId))
         );
 
         String profileImageId = user.profileImageId();

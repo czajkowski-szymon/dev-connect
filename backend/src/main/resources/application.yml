@@ -1,17 +1,17 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/devconnect
-    username: postgres
+    username: root
     password: root
-
+    driver-class-name: org.postgresql.Driver
   jpa:
+    hibernate:
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
-    hibernate:
-      ddl-auto: create-drop
-
+    show-sql: false
+    
 rsa:
   public-key: classpath:certs/public.pem
   private-key: classpath:certs/private.pem

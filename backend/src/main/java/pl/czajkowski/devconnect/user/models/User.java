@@ -8,6 +8,7 @@ import pl.czajkowski.devconnect.technology.Technology;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(
@@ -36,7 +37,7 @@ public class User implements UserDetails {
     private String firstName;
     private String githubUrl;
     private String profileImageId;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_technology",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -173,5 +174,44 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return locked == user.locked &&
+                enabled == user.enabled &&
+                Objects.equals(id, user.id) &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(firstName, user.firstName) &&
+                Objects.equals(githubUrl, user.githubUrl) &&
+                Objects.equals(profileImageId, user.profileImageId) &&
+                Objects.equals(technologies, user.technologies) && role == user.role;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                id, email, password, firstName, githubUrl, profileImageId, technologies, role, locked, enabled
+        );
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", githubUrl='" + githubUrl + '\'' +
+                ", profileImageId='" + profileImageId + '\'' +
+                ", technologies=" + technologies +
+                ", role=" + role +
+                ", locked=" + locked +
+                ", enabled=" + enabled +
+                '}';
     }
 }
