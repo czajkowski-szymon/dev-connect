@@ -14,7 +14,7 @@ create table user_
             unique,
     enabled          boolean      not null,
     first_name       varchar(255) not null,
-    github_url       varchar(255),
+    git_url       varchar(255),
     locked           boolean      not null,
     password         varchar(255) not null,
     profile_image_id varchar(255)

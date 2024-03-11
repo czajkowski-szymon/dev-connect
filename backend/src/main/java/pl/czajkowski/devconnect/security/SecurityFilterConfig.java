@@ -19,7 +19,7 @@ public class SecurityFilterConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         auth -> auth
-                            .requestMatchers("/api/users/**", "/api/auth/login").permitAll()
+                            .requestMatchers("/api/users/register", "/api/auth/login").permitAll()
                             .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(

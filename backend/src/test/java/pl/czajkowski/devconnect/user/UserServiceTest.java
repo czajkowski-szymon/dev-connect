@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.support.ArgumentConvertingMethodInvoker;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
@@ -89,7 +88,7 @@ class UserServiceTest {
         assertThat(capturedUser.getEmail()).isEqualTo(request.email());
         assertThat(capturedUser.getPassword()).isEqualTo(hashedPassword);
         assertThat(capturedUser.getFirstName()).isEqualTo(request.firstName());
-        assertThat(capturedUser.getGithubUrl()).isEqualTo(request.githubUrl());
+        assertThat(capturedUser.getGitUrl()).isEqualTo(request.gitUrl());
         assertThat(capturedUser.getProfileImageId()).isNull();
         assertThat(capturedUser.getTechnologies()).isEqualTo(technologies);
         assertThat(capturedUser.getRole()).isEqualTo(Role.USER);

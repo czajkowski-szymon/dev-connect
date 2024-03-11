@@ -49,7 +49,7 @@ public class UserService {
                 request.email(),
                 encoder.encode(request.password()),
                 request.firstName(),
-                request.githubUrl(),
+                request.gitUrl(),
                 Role.USER,
                 false,
                 true

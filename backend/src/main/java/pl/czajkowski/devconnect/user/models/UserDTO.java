@@ -8,7 +8,7 @@ public record UserDTO(
         Integer id,
         String email,
         String firstName,
-        String githubUrl,
+        String gitUrl,
         String profileImageId,
         List<Technology> technologies
 ) {

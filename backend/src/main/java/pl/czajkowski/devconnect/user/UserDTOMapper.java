@@ -1,6 +1,5 @@
 package pl.czajkowski.devconnect.user;
 
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import pl.czajkowski.devconnect.user.models.User;
 import pl.czajkowski.devconnect.user.models.UserDTO;
@@ -15,7 +14,7 @@ public class UserDTOMapper implements Function<User, UserDTO> {
                 user.getId(),
                 user.getEmail(),
                 user.getFirstName(),
-                user.getGithubUrl(),
+                user.getGitUrl(),
                 user.getProfileImageId(),
                 user.getTechnologies()
         );

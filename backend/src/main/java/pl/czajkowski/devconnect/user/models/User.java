@@ -35,7 +35,7 @@ public class User implements UserDetails {
     private String password;
     @Column(nullable = false)
     private String firstName;
-    private String githubUrl;
+    private String gitUrl;
     private String profileImageId;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -44,6 +44,7 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "technology_id")
     )
     private List<Technology> technologies;
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
     private boolean locked;
@@ -55,7 +56,7 @@ public class User implements UserDetails {
             String email,
             String password,
             String firstName,
-            String githubUrl,
+            String gitUrl,
             Role role,
             boolean locked,
             boolean enabled
@@ -63,7 +64,7 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
-        this.githubUrl = githubUrl;
+        this.gitUrl = gitUrl;
         this.role = role;
         this.locked = locked;
         this.enabled = enabled;
@@ -97,12 +98,12 @@ public class User implements UserDetails {
         this.firstName = firstName;
     }
 
-    public String getGithubUrl() {
-        return githubUrl;
+    public String getGitUrl() {
+        return gitUrl;
     }
 
-    public void setGithubUrl(String githubUrl) {
-        this.githubUrl = githubUrl;
+    public void setGitUrl(String gitUrl) {
+        this.gitUrl = gitUrl;
     }
 
     public String getProfileImageId() {
@@ -187,7 +188,7 @@ public class User implements UserDetails {
                 Objects.equals(email, user.email) &&
                 Objects.equals(password, user.password) &&
                 Objects.equals(firstName, user.firstName) &&
-                Objects.equals(githubUrl, user.githubUrl) &&
+                Objects.equals(gitUrl, user.gitUrl) &&
                 Objects.equals(profileImageId, user.profileImageId) &&
                 Objects.equals(technologies, user.technologies) && role == user.role;
     }
@@ -195,7 +196,7 @@ public class User implements UserDetails {
     @Override
     public int hashCode() {
         return Objects.hash(
-                id, email, password, firstName, githubUrl, profileImageId, technologies, role, locked, enabled
+                id, email, password, firstName, gitUrl, profileImageId, technologies, role, locked, enabled
         );
     }
 
@@ -206,7 +207,7 @@ public class User implements UserDetails {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", firstName='" + firstName + '\'' +
-                ", githubUrl='" + githubUrl + '\'' +
+                ", gitUrl='" + gitUrl + '\'' +
                 ", profileImageId='" + profileImageId + '\'' +
                 ", technologies=" + technologies +
                 ", role=" + role +

@@ -19,14 +19,14 @@ class UserDTOMapperTest {
         String email = "john@gmail.com";
         String password = "password";
         String firstName = "John";
-        String githubUrl = "github.com";
+        String gitUrl = "github.com";
         Role role = Role.USER;
         List<Technology> technologies = new ArrayList<>();
         User user = new User(
                 email,
                 password,
                 firstName,
-                githubUrl,
+                gitUrl,
                 role,
                 false,
                 true
@@ -40,7 +40,7 @@ class UserDTOMapperTest {
         assertThat(userDto.id()).isEqualTo(1);
         assertThat(userDto.email()).isEqualTo(email);
         assertThat(userDto.firstName()).isEqualTo(firstName);
-        assertThat(userDto.githubUrl()).isEqualTo(githubUrl);
+        assertThat(userDto.gitUrl()).isEqualTo(gitUrl);
         assertThat(userDto.profileImageId()).isEqualTo("1111");
         assertThat(userDto.technologies()).isEqualTo(technologies);
     }
