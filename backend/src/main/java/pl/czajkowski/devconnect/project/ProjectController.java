@@ -7,6 +7,7 @@ import pl.czajkowski.devconnect.project.model.AddProjectRequest;
 import pl.czajkowski.devconnect.project.model.ProjectDTO;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/projects")
@@ -16,6 +17,12 @@ public class ProjectController {
 
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ProjectDTO>> getAllProjectManagedByUser(@PathVariable Integer userId,
+                                                                       Authentication user) {
+        return ResponseEntity.ok(projectService.getAllProjectManagedByUser(userId, user.getName()));
     }
 
     @PostMapping
@@ -29,5 +36,11 @@ public class ProjectController {
                                                               @PathVariable("userId") Integer userId,
                                                               Authentication user) {
         return ResponseEntity.ok(projectService.addContributorToProject(projectId, userId, user.getName()));
+    }
+
+    @DeleteMapping("/{projectId}")
+    public ResponseEntity<?> deleteProject(@PathVariable Integer projectId, Authentication user) {
+        projectService.deleteProject(projectId, user.getName());
+        return ResponseEntity.noContent().build();
     }
 }

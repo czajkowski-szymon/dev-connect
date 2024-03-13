@@ -1,19 +1,20 @@
 package pl.czajkowski.devconnect.user;
 
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pl.czajkowski.devconnect.exception.EmailAlreadyExistsException;
 import pl.czajkowski.devconnect.exception.ResourceNotFoundException;
 import pl.czajkowski.devconnect.exception.UserNotFoundException;
-import pl.czajkowski.devconnect.project.model.Project;
+import pl.czajkowski.devconnect.project.ProjectRepository;
+import pl.czajkowski.devconnect.project.model.ProjectDTO;
 import pl.czajkowski.devconnect.s3.S3Service;
 import pl.czajkowski.devconnect.technology.Technology;
 import pl.czajkowski.devconnect.technology.TechnologyRepository;
 import pl.czajkowski.devconnect.user.models.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;

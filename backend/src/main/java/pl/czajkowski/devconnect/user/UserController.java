@@ -2,12 +2,15 @@ package pl.czajkowski.devconnect.user;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pl.czajkowski.devconnect.project.model.ProjectDTO;
 import pl.czajkowski.devconnect.user.models.RegistrationRequest;
 import pl.czajkowski.devconnect.user.models.RegistrationResponse;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")

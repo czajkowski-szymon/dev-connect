@@ -5,17 +5,14 @@ import org.springframework.stereotype.Service;
 import pl.czajkowski.devconnect.exception.ProjectAssignmentException;
 import pl.czajkowski.devconnect.exception.ProjectOwnershipException;
 import pl.czajkowski.devconnect.exception.ResourceNotFoundException;
-import pl.czajkowski.devconnect.exception.UserNotFoundException;
 import pl.czajkowski.devconnect.project.model.AddProjectRequest;
 import pl.czajkowski.devconnect.project.model.Project;
 import pl.czajkowski.devconnect.project.model.ProjectDTO;
 import pl.czajkowski.devconnect.technology.Technology;
 import pl.czajkowski.devconnect.technology.TechnologyRepository;
-import pl.czajkowski.devconnect.user.UserRepository;
 import pl.czajkowski.devconnect.user.UserService;
 import pl.czajkowski.devconnect.user.models.User;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,6 +39,13 @@ public class ProjectService {
         this.userService = userService;
         this.userDetailsService = userDetailsService;
         this.mapper = mapper;
+    }
+
+    public List<ProjectDTO> getAllProjectManagedByUser(Integer userId, String username) {
+        User user = (User) userDetailsService.loadUserByUsername(username);
+        return projectRepository.findByProjectManager(user).stream()
+                .map(mapper)
+                .toList();
     }
 
     public ProjectDTO addProject(AddProjectRequest request, String username) {
@@ -71,6 +75,16 @@ public class ProjectService {
         contributor.addContributedProject(project);
 
         return mapper.apply(projectRepository.save(project));
+    }
+
+
+    public void deleteProject(Integer projectId, String username) {
+        User projectManager = (User) userDetailsService.loadUserByUsername(username);
+        Project project = getProjectById(projectId);
+
+        validateProjectOwnership(project, projectManager);
+
+        projectRepository.deleteById(projectId);
     }
 
     private List<Technology> mapTechnologiesToProject(List<String> technologyNames, Project project) {
