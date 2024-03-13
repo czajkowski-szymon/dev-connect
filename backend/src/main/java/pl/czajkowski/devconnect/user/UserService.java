@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.czajkowski.devconnect.exception.EmailAlreadyExistsException;
 import pl.czajkowski.devconnect.exception.ResourceNotFoundException;
 import pl.czajkowski.devconnect.exception.UserNotFoundException;
+import pl.czajkowski.devconnect.project.model.Project;
 import pl.czajkowski.devconnect.s3.S3Service;
 import pl.czajkowski.devconnect.technology.Technology;
 import pl.czajkowski.devconnect.technology.TechnologyRepository;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -40,10 +42,7 @@ public class UserService {
     }
 
     public RegistrationResponse register(RegistrationRequest request) {
-        boolean emailExists = userRepository.existsUserByEmail(request.email());
-        if (emailExists) {
-            throw new EmailAlreadyExistsException("User with email: " + request.email() + " already exists");
-        }
+        validateEmail(request.email());
 
         User user = new User(
                 request.email(),
@@ -55,19 +54,16 @@ public class UserService {
                 true
         );
 
-        List<Technology> technologies = new ArrayList<>();
-        List<String> technologyNames = request.technologies();
-        for (String technologyName : technologyNames) {
-            Technology t = technologyRepository.findByTechnologyName(technologyName).orElseThrow(
-                    () -> new ResourceNotFoundException("Technology not found")
-            );
-            t.addUser(user);
-            technologies.add(t);
-        }
-
+        List<Technology> technologies = mapTechnologiesToUser(request.technologies(), user);
         user.setTechnologies(technologies);
 
         return new RegistrationResponse(mapper.apply(userRepository.save(user)), REGISTER_SUCCESS_MSG);
+    }
+
+    public User getUserById(Integer userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException("User with id: [%s] not found".formatted(userId))
+        );
     }
 
     public void uploadProfileImage(Integer userId, MultipartFile file) {
@@ -87,9 +83,7 @@ public class UserService {
     }
 
     public byte[] downloadProfileImage(Integer userId) {
-        UserDTO user = userRepository.findById(userId).map(mapper).orElseThrow(
-                () -> new UserNotFoundException("User with id: [%s] not found".formatted(userId))
-        );
+        UserDTO user = mapper.apply(getUserById(userId));
 
         String profileImageId = user.profileImageId();
         if (profileImageId.isBlank()) {
@@ -97,5 +91,20 @@ public class UserService {
         }
 
         return s3.downloadFile("profile-images/%s/%s".formatted(userId, profileImageId));
+    }
+
+    private void validateEmail(String email) {
+        if (userRepository.existsUserByEmail(email)) {
+            throw new EmailAlreadyExistsException("User with email: " + email + " already exists");
+        }
+    }
+
+    private List<Technology> mapTechnologiesToUser(List<String> technologyNames, User user) {
+        return technologyNames.stream()
+                .map(technologyName -> technologyRepository.findByTechnologyName(technologyName).orElseThrow(
+                        () -> new ResourceNotFoundException("Technology not found")
+                ))
+                .peek(technology -> technology.addUser(user))
+                .collect(Collectors.toList());
     }
 }

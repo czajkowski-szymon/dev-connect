@@ -58,4 +58,28 @@ public class ApiExceptionHandler {
 
         return new ResponseEntity<>(err, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(ProjectOwnershipException.class)
+    public ResponseEntity<ErrorResponse> handleException(ProjectOwnershipException e, HttpServletRequest request) {
+        ErrorResponse err = new ErrorResponse(
+                request.getRequestURI(),
+                HttpStatus.CONFLICT.value(),
+                e.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(err, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ProjectAssignmentException.class)
+    public ResponseEntity<ErrorResponse> handleException(ProjectAssignmentException e, HttpServletRequest request) {
+        ErrorResponse err = new ErrorResponse(
+                request.getRequestURI(),
+                HttpStatus.CONFLICT.value(),
+                e.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(err, HttpStatus.CONFLICT);
+    }
 }

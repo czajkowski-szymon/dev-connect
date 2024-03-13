@@ -2,6 +2,7 @@ package pl.czajkowski.devconnect.technology;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import pl.czajkowski.devconnect.project.model.Project;
 import pl.czajkowski.devconnect.user.models.User;
 
 import java.util.ArrayList;
@@ -20,6 +21,9 @@ public class Technology {
     @JsonIgnore
     @ManyToMany(mappedBy = "technologies")
     private List<User> users;
+    @JsonIgnore
+    @ManyToMany(mappedBy = "technologies")
+    private List<Project> projects;
 
     public Technology() {}
 
@@ -57,6 +61,13 @@ public class Technology {
             users = new ArrayList<>();
         }
         users.add(user);
+    }
+
+    public void addProject(Project project) {
+        if (projects == null) {
+            projects = new ArrayList<>();
+        }
+        projects.add(project);
     }
 
     @Override

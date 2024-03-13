@@ -4,8 +4,11 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import pl.czajkowski.devconnect.project.ProjectRepository;
+import pl.czajkowski.devconnect.project.model.Project;
 import pl.czajkowski.devconnect.technology.Technology;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -29,14 +32,20 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @Column(nullable = false)
     private String email;
+
     @Column(nullable = false)
     private String password;
+
     @Column(nullable = false)
     private String firstName;
+
     private String gitUrl;
+
     private String profileImageId;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_technology",
@@ -44,10 +53,24 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "technology_id")
     )
     private List<Technology> technologies;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_project",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_id")
+    )
+    private List<Project> contributedProjects;
+
+    @OneToMany(mappedBy = "projectManager")
+    private List<Project> managedProject;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
     private boolean locked;
+
     private boolean enabled;
 
     public User() {}
@@ -175,6 +198,13 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public void addContributedProject(Project project) {
+        if (contributedProjects == null) {
+            contributedProjects = new ArrayList<>();
+        }
+        contributedProjects.add(project);
     }
 
     @Override
