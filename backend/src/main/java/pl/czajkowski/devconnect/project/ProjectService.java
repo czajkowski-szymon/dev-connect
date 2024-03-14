@@ -5,13 +5,16 @@ import org.springframework.stereotype.Service;
 import pl.czajkowski.devconnect.exception.ProjectAssignmentException;
 import pl.czajkowski.devconnect.exception.ProjectOwnershipException;
 import pl.czajkowski.devconnect.exception.ResourceNotFoundException;
+import pl.czajkowski.devconnect.exception.UserNotFoundException;
 import pl.czajkowski.devconnect.project.model.AddProjectRequest;
 import pl.czajkowski.devconnect.project.model.Project;
 import pl.czajkowski.devconnect.project.model.ProjectDTO;
 import pl.czajkowski.devconnect.technology.Technology;
 import pl.czajkowski.devconnect.technology.TechnologyRepository;
+import pl.czajkowski.devconnect.user.UserDTOMapper;
 import pl.czajkowski.devconnect.user.UserService;
 import pl.czajkowski.devconnect.user.models.User;
+import pl.czajkowski.devconnect.user.models.UserDTO;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,24 +30,34 @@ public class ProjectService {
 
     private final UserDetailsService userDetailsService;
 
-    private final ProjectDTOMapper mapper;
+    private final ProjectDTOMapper projectMapper;
+
+    private final UserDTOMapper userMapper;
 
     public ProjectService(ProjectRepository projectRepository,
                           TechnologyRepository technologyRepository,
                           UserService userService,
                           UserDetailsService userDetailsService,
-                          ProjectDTOMapper mapper) {
+                          ProjectDTOMapper projectMapper,
+                          UserDTOMapper userMapper) {
         this.projectRepository = projectRepository;
         this.technologyRepository = technologyRepository;
         this.userService = userService;
         this.userDetailsService = userDetailsService;
-        this.mapper = mapper;
+        this.projectMapper = projectMapper;
+        this.userMapper = userMapper;
+    }
+
+    public ProjectDTO getProject(Integer projectId) {
+        return projectRepository.findById(projectId).map(projectMapper).orElseThrow(
+                () -> new ResourceNotFoundException("Project with id: [%s] not found".formatted(projectId))
+        );
     }
 
     public List<ProjectDTO> getAllProjectManagedByUser(Integer userId, String username) {
         User user = (User) userDetailsService.loadUserByUsername(username);
         return projectRepository.findByProjectManager(user).stream()
-                .map(mapper)
+                .map(projectMapper)
                 .toList();
     }
 
@@ -60,7 +73,16 @@ public class ProjectService {
         List<Technology> technologies = mapTechnologiesToProject(request.technologies(), project);
         project.setTechnologies(technologies);
 
-        return mapper.apply(projectRepository.save(project));
+        return projectMapper.apply(projectRepository.save(project));
+    }
+
+
+    public List<UserDTO> getAllContributorsForProject(Integer projectId) {
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                () -> new ResourceNotFoundException("Project with id: [%s] not found".formatted(projectId))
+        );
+
+        return project.getContributors().stream().map(userMapper).toList();
     }
 
     public ProjectDTO addContributorToProject(Integer projectId, Integer userId, String username) {
@@ -74,9 +96,26 @@ public class ProjectService {
         project.getContributors().add(contributor);
         contributor.addContributedProject(project);
 
-        return mapper.apply(projectRepository.save(project));
+        return projectMapper.apply(projectRepository.save(project));
     }
 
+    public ProjectDTO deleteContributor(Integer projectId, Integer userId, String username) {
+        User projectManager = (User) userDetailsService.loadUserByUsername(username);
+        Project project = getProjectById(projectId);
+
+        validateProjectOwnership(project, projectManager);
+
+        User contributor = project.getContributors().stream()
+                .filter(c -> c.getId().equals(userId))
+                .findFirst()
+                .orElseThrow(
+                        () -> new UserNotFoundException("User with id: %s is not contributor of this project")
+                );
+
+        project.getContributors().remove(contributor);
+        projectRepository.deleteContributor(userId, projectId);
+        return projectMapper.apply(project);
+    }
 
     public void deleteProject(Integer projectId, String username) {
         User projectManager = (User) userDetailsService.loadUserByUsername(username);

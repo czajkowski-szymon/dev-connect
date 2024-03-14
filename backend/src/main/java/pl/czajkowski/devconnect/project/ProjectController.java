@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.czajkowski.devconnect.project.model.AddProjectRequest;
 import pl.czajkowski.devconnect.project.model.ProjectDTO;
+import pl.czajkowski.devconnect.user.models.UserDTO;
 
 import java.net.URI;
 import java.util.List;
@@ -19,6 +20,11 @@ public class ProjectController {
         this.projectService = projectService;
     }
 
+    @GetMapping("{projectId}")
+    public ResponseEntity<ProjectDTO> getProject(@PathVariable("projectId") Integer projectId) {
+        return ResponseEntity.ok(projectService.getProject(projectId));
+    }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<ProjectDTO>> getAllProjectManagedByUser(@PathVariable Integer userId,
                                                                        Authentication user) {
@@ -31,11 +37,23 @@ public class ProjectController {
         return ResponseEntity.created(URI.create("/projects/" + response.id())).body(response);
     }
 
+    @GetMapping("/{projectId}/contributors")
+    public ResponseEntity<List<UserDTO>> getAllContributorsForProject(@PathVariable Integer projectId) {
+        return ResponseEntity.ok(projectService.getAllContributorsForProject(projectId));
+    }
+
     @PostMapping("/{projectId}/contributors/{userId}")
     public ResponseEntity<ProjectDTO> addContributorToProject(@PathVariable("projectId") Integer projectId,
                                                               @PathVariable("userId") Integer userId,
                                                               Authentication user) {
         return ResponseEntity.ok(projectService.addContributorToProject(projectId, userId, user.getName()));
+    }
+
+    @DeleteMapping("/{projectId}/contributors/{userId}")
+    public ResponseEntity<ProjectDTO> deleteContributor(@PathVariable("projectId") Integer projectId,
+                                               @PathVariable("userId") Integer userId,
+                                               Authentication user) {
+        return ResponseEntity.ok(projectService.deleteContributor(projectId, userId, user.getName()));
     }
 
     @DeleteMapping("/{projectId}")
