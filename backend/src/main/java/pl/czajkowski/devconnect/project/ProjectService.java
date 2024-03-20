@@ -9,6 +9,7 @@ import pl.czajkowski.devconnect.exception.UserNotFoundException;
 import pl.czajkowski.devconnect.project.model.AddProjectRequest;
 import pl.czajkowski.devconnect.project.model.Project;
 import pl.czajkowski.devconnect.project.model.ProjectDTO;
+import pl.czajkowski.devconnect.project.model.UpdateProjectRequest;
 import pl.czajkowski.devconnect.technology.Technology;
 import pl.czajkowski.devconnect.technology.TechnologyRepository;
 import pl.czajkowski.devconnect.user.UserDTOMapper;
@@ -76,7 +77,6 @@ public class ProjectService {
         return projectMapper.apply(projectRepository.save(project));
     }
 
-
     public List<UserDTO> getAllContributorsForProject(Integer projectId) {
         Project project = projectRepository.findById(projectId).orElseThrow(
                 () -> new ResourceNotFoundException("Project with id: [%s] not found".formatted(projectId))
@@ -95,6 +95,21 @@ public class ProjectService {
         User contributor = userService.getUserById(userId);
         project.getContributors().add(contributor);
         contributor.addContributedProject(project);
+
+        return projectMapper.apply(projectRepository.save(project));
+    }
+
+    public ProjectDTO updateProject(UpdateProjectRequest request, String username) {
+        User projectManager = (User) userDetailsService.loadUserByUsername(username);
+        Project project = getProjectById(request.id());
+
+        validateProjectOwnership(project, projectManager);
+
+        project.setProjectName(request.projectName());
+        project.setDescription(request.description());
+
+        List<Technology> technologies = mapTechnologiesToProject(request.technologies(), project);
+        project.setTechnologies(technologies);
 
         return projectMapper.apply(projectRepository.save(project));
     }

@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.czajkowski.devconnect.project.model.AddProjectRequest;
 import pl.czajkowski.devconnect.project.model.ProjectDTO;
+import pl.czajkowski.devconnect.project.model.UpdateProjectRequest;
 import pl.czajkowski.devconnect.user.models.UserDTO;
 
 import java.net.URI;
@@ -47,6 +48,11 @@ public class ProjectController {
                                                               @PathVariable("userId") Integer userId,
                                                               Authentication user) {
         return ResponseEntity.ok(projectService.addContributorToProject(projectId, userId, user.getName()));
+    }
+
+    @PutMapping
+    public ResponseEntity<ProjectDTO> updateProject(@RequestBody UpdateProjectRequest request, Authentication user) {
+        return ResponseEntity.ok(projectService.updateProject(request, user.getName()));
     }
 
     @DeleteMapping("/{projectId}/contributors/{userId}")
