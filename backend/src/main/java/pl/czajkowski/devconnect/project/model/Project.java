@@ -1,6 +1,8 @@
 package pl.czajkowski.devconnect.project.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import pl.czajkowski.devconnect.task.models.Task;
 import pl.czajkowski.devconnect.technology.Technology;
 import pl.czajkowski.devconnect.user.models.User;
 
@@ -34,6 +36,9 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "technology_id")
     )
     private List<Technology> technologies;
+
+    @OneToMany(mappedBy = "project")
+    private List<Task> tasks;
 
     public Project() {
     }

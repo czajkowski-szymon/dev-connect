@@ -82,4 +82,28 @@ public class ApiExceptionHandler {
 
         return new ResponseEntity<>(err, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(ProjectContributionException.class)
+    public ResponseEntity<ErrorResponse> handleException(ProjectContributionException e, HttpServletRequest request) {
+        ErrorResponse err = new ErrorResponse(
+                request.getRequestURI(),
+                HttpStatus.CONFLICT.value(),
+                e.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(err, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(TaskNotBelongToProjectException.class)
+    public ResponseEntity<ErrorResponse> handleException(TaskNotBelongToProjectException e, HttpServletRequest request) {
+        ErrorResponse err = new ErrorResponse(
+                request.getRequestURI(),
+                HttpStatus.CONFLICT.value(),
+                e.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(err, HttpStatus.CONFLICT);
+    }
 }

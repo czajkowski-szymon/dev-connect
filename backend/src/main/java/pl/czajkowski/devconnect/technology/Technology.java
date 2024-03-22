@@ -18,11 +18,11 @@ public class Technology {
     private Integer id;
     @Column(nullable = false)
     private String technologyName;
-    @JsonIgnore
-    @ManyToMany(mappedBy = "technologies")
+
+    @ManyToMany(mappedBy = "technologies", fetch = FetchType.LAZY)
     private List<User> users;
-    @JsonIgnore
-    @ManyToMany(mappedBy = "technologies")
+
+    @ManyToMany(mappedBy = "technologies", fetch = FetchType.LAZY)
     private List<Project> projects;
 
     public Technology() {}
@@ -48,12 +48,22 @@ public class Technology {
         this.technologyName = technologyName;
     }
 
+    @JsonIgnore
     public List<User> getUsers() {
         return users;
     }
 
     public void setUsers(List<User> user) {
         this.users = user;
+    }
+
+    @JsonIgnore
+    public List<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<Project> projects) {
+        this.projects = projects;
     }
 
     public void addUser(User user) {

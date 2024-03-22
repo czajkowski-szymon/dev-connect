@@ -1,11 +1,13 @@
 package pl.czajkowski.devconnect.user.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import pl.czajkowski.devconnect.project.ProjectRepository;
 import pl.czajkowski.devconnect.project.model.Project;
+import pl.czajkowski.devconnect.task.models.Task;
 import pl.czajkowski.devconnect.technology.Technology;
 
 import java.util.ArrayList;
@@ -64,6 +66,9 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "projectManager")
     private List<Project> managedProject;
+
+    @OneToMany(mappedBy = "user")
+    private List<Task> tasks;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -143,6 +148,30 @@ public class User implements UserDetails {
 
     public void setTechnologies(List<Technology> technologies) {
         this.technologies = technologies;
+    }
+
+    public List<Project> getContributedProjects() {
+        return contributedProjects;
+    }
+
+    public void setContributedProjects(List<Project> contributedProjects) {
+        this.contributedProjects = contributedProjects;
+    }
+
+    public List<Project> getManagedProject() {
+        return managedProject;
+    }
+
+    public void setManagedProject(List<Project> managedProject) {
+        this.managedProject = managedProject;
+    }
+
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
     }
 
     public Role getRole() {
