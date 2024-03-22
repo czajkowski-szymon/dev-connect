@@ -32,10 +32,9 @@ public class Task {
     public Task() {
     }
 
-    public Task(String body, LocalDate deadline, User user) {
+    public Task(String body, LocalDate deadline) {
         this.body = body;
         this.deadline = deadline;
-        this.user = user;
     }
 
     public Integer getId() {

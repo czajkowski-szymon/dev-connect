@@ -2,16 +2,16 @@ package pl.czajkowski.devconnect.task;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import pl.czajkowski.devconnect.task.models.AddTaskRequest;
 import pl.czajkowski.devconnect.task.models.Task;
+import pl.czajkowski.devconnect.task.models.UpdateTaskUser;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/projects")
+@RequestMapping("/api/projects")
 public class TaskController {
 
     private final TaskService taskService;
@@ -30,5 +30,28 @@ public class TaskController {
                                                   @PathVariable("taskId") Integer taskId,
                                                   Authentication user) {
         return ResponseEntity.ok(taskService.getTaskForProject(projectId, taskId, user.getName()));
+    }
+
+    @PostMapping("/{projectId}/tasks")
+    public ResponseEntity<Task> addTaskForProject(@RequestBody AddTaskRequest request,
+                                                  @PathVariable Integer projectId,
+                                                  Authentication user) {
+        Task response = taskService.addTaskForProject(request, projectId, user.getName());
+        return ResponseEntity.created(URI.create("/projects/%s/tasks/".formatted(projectId) + response.getId())).body(response);
+    }
+
+    @PutMapping("/{projectId}/tasks")
+    public ResponseEntity<Task> updateTask(@RequestBody UpdateTaskUser request,
+                                           @PathVariable Integer projectId,
+                                           Authentication user) {
+        return ResponseEntity.ok(taskService.updateTask(request, projectId, user.getName()));
+    }
+
+    @DeleteMapping("/{projectId}/tasks/{taskId}")
+    public ResponseEntity<?> deleteTask(@PathVariable("projectId") Integer projectId,
+                                        @PathVariable("taskId") Integer taskId,
+                                        Authentication user) {
+        taskService.deleteTask(projectId, taskId, user.getName());
+        return ResponseEntity.noContent().build();
     }
 }
