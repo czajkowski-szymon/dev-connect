@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import pl.czajkowski.devconnect.exception.ProjectContributionException;
 import pl.czajkowski.devconnect.exception.ResourceNotFoundException;
 import pl.czajkowski.devconnect.exception.TaskNotBelongToProjectException;
+import pl.czajkowski.devconnect.exception.TaskNotBelongToUserException;
 import pl.czajkowski.devconnect.project.ProjectRepository;
 import pl.czajkowski.devconnect.project.model.Project;
 import pl.czajkowski.devconnect.task.models.AddTaskRequest;
@@ -13,6 +14,7 @@ import pl.czajkowski.devconnect.task.models.TaskDTO;
 import pl.czajkowski.devconnect.task.models.UpdateTaskRequest;
 import pl.czajkowski.devconnect.user.UserService;
 import pl.czajkowski.devconnect.user.models.User;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.util.List;
 
@@ -47,7 +49,7 @@ public class TaskService {
                 () -> new ResourceNotFoundException("Project with id: [%s] not found".formatted(projectId))
         );
 
-        validateProjectContributionOrManaging(project, user);
+        validateProjectContributionOrManaging(user, projectId);
 
         return taskRepository.findAllByProjectId(projectId)
                 .stream()
@@ -57,17 +59,14 @@ public class TaskService {
 
     public TaskDTO getTaskForProject(Integer projectId, Integer taskId, String username) {
         User user = (User) userDetailsService.loadUserByUsername(username);
-        Project project = projectRepository.findById(projectId).orElseThrow(
-                () -> new ResourceNotFoundException("Project with id: [%s] not found".formatted(projectId))
-        );
 
-        validateProjectContributionOrManaging(project, user);
+        validateProjectContributionOrManaging(user, projectId);
 
         Task task = taskRepository.findById(taskId).orElseThrow(
                 () -> new ResourceNotFoundException("Task with id: [%s] not found".formatted(taskId))
         );
 
-        validateTaskBelongsToProject(project, task);
+        validateTaskBelongsToProject(task, projectId);
 
         return mapper.apply(
                 taskRepository.findById(taskId).orElseThrow(
@@ -77,18 +76,17 @@ public class TaskService {
     }
 
     public TaskDTO addTaskForProject(AddTaskRequest request, Integer projectId, String username) {
-
         User projectManager = (User) userDetailsService.loadUserByUsername(username);
 
         Project project = projectRepository.findById(projectId).orElseThrow(
                 () -> new ResourceNotFoundException("Project with id: [%s] not found".formatted(projectId))
         );
 
-        validateProjectManaging(project, projectManager);
+        validateProjectManaging(projectManager, projectId);
 
         User user = userService.getUserById(request.userId());
 
-        validateProjectContribution(project, user);
+        validateProjectContribution(user, projectId);
 
         Task task = new Task(
                 request.body(),
@@ -102,11 +100,8 @@ public class TaskService {
 
     public TaskDTO updateTask(UpdateTaskRequest request, Integer projectId, String username) {
         User projectManager = (User) userDetailsService.loadUserByUsername(username);
-        Project project = projectRepository.findById(projectId).orElseThrow(
-                () -> new ResourceNotFoundException("Project with id: [%s] not found".formatted(projectId))
-        );
 
-        validateProjectManaging(project, projectManager);
+        validateProjectManaging(projectManager, projectId);
 
         Task task = taskRepository.findById(request.id()).orElseThrow(
                 () -> new ResourceNotFoundException("Task with id: [%] not found")
@@ -119,55 +114,87 @@ public class TaskService {
 
     public void deleteTask(Integer projectId, Integer taskId, String username) {
         User projectManager = (User) userDetailsService.loadUserByUsername(username);
-        Project project = projectRepository.findById(projectId).orElseThrow(
-                () -> new ResourceNotFoundException("Project with id: [%s] not found".formatted(projectId))
-        );
 
-        validateProjectManaging(project, projectManager);
+        validateProjectManaging(projectManager, projectId);
 
         taskRepository.deleteById(taskId);
     }
 
-    private void validateProjectContributionOrManaging(Project project, User user) {
-        if (!isUserProjectManager(project, user) && !isUserProjectContributor(project, user)) {
+    public void setTaskDone(Integer projectId, Integer taskId, String username) {
+        User user = (User) userDetailsService.loadUserByUsername(username);
+        validateTaskBelongingOrProjectManaging(user, projectId, taskId);
+
+        Task task = taskRepository.findById(taskId).orElseThrow(
+                () -> new ResourceNotFoundException("Task with id: [%s] not found")
+        );
+        task.setDone(true);
+        taskRepository.save(task);
+    }
+
+    private void validateTaskBelongingOrProjectManaging(User user, Integer projectId, Integer taskId) {
+        if (!isUserTaskOwner(user, taskId) && !isUserProjectManager(user, projectId)) {
+            throw new TaskNotBelongToUserException(
+                    "Task with id: [%s] does not belong to user with id: [%s]".formatted(taskId, user.getId())
+            );
+        }
+    }
+
+    private void validateProjectContributionOrManaging(User user, Integer projectId) {
+        if (!isUserProjectManager(user, projectId) && !isUserProjectContributor(user, projectId)) {
             throw new ProjectContributionException(
                     "User with id: [%s] is not manager nor contributor for project with id: [%s]"
-                            .formatted(user.getId(), project.getId())
+                            .formatted(user.getId(), projectId)
             );
         }
     }
 
-    private void validateProjectManaging(Project project, User user) {
-        if (!isUserProjectManager(project, user)) {
+    private void validateProjectManaging(User user, Integer projectId) {
+        if (!isUserProjectManager(user, projectId)) {
             throw new ProjectContributionException(
                     "User with id: [%s] is not manager for project with id: [%s]"
-                        .formatted(user.getId(), project.getId())
+                        .formatted(user.getId(), projectId)
             );
         }
     }
 
-    private void validateProjectContribution(Project project, User user) {
-        if (!isUserProjectContributor(project, user)) {
+    private void validateProjectContribution(User user, Integer projectId) {
+        if (!isUserProjectContributor(user, projectId)) {
             throw new ProjectContributionException(
                     "User with id: [%s] is not contributor for project with id: [%s]"
-                            .formatted(user.getId(), project.getId())
+                            .formatted(user.getId(), projectId)
             );
         }
     }
 
-    private void validateTaskBelongsToProject(Project project, Task task) {
-        if (!task.getProject().equals(project)) {
+    private void validateTaskBelongsToProject(Task task, Integer projectId) {
+        if (!task.getProject().getId().equals(projectId)) {
             throw new TaskNotBelongToProjectException(
-                    "Task with id: [%s] does not belong to project with id: [%s]".formatted(task.getId(), project.getId())
+                    "Task with id: [%s] does not belong to project with id: [%s]".formatted(task.getId(), projectId)
             );
         }
     }
 
-    private boolean isUserProjectManager(Project project, User user) {
-        return project.getProjectManager().equals(user);
+    private boolean isUserProjectManager(User user, Integer projectId) {
+        return user.getManagedProject()
+                .stream()
+                .map(Project::getId)
+                .toList()
+                .contains(projectId);
     }
 
-    private boolean isUserProjectContributor(Project project, User user) {
-        return project.getContributors().contains(user);
+    private boolean isUserProjectContributor(User user, Integer projectId) {
+        return user.getContributedProjects()
+                .stream()
+                .map(Project::getId)
+                .toList()
+                .contains(projectId);
+    }
+
+    private boolean isUserTaskOwner(User user, Integer taskId) {
+        return user.getTasks()
+                .stream()
+                .map(Task::getId)
+                .toList()
+                .contains(taskId);
     }
 }

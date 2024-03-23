@@ -106,4 +106,16 @@ public class ApiExceptionHandler {
 
         return new ResponseEntity<>(err, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(TaskNotBelongToUserException.class)
+    public ResponseEntity<ErrorResponse> handleException(TaskNotBelongToUserException e, HttpServletRequest request) {
+        ErrorResponse err = new ErrorResponse(
+                request.getRequestURI(),
+                HttpStatus.CONFLICT.value(),
+                e.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(err, HttpStatus.CONFLICT);
+    }
 }

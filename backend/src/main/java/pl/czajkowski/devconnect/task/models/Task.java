@@ -29,7 +29,7 @@ public class Task {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "poject_id")
+    @JoinColumn(name = "project_id")
     private Project project;
 
     public Task() {
@@ -38,6 +38,7 @@ public class Task {
     public Task(String body, LocalDate deadline) {
         this.body = body;
         this.deadline = deadline;
+        this.isDone = false;
     }
 
     public Integer getId() {
@@ -72,7 +73,6 @@ public class Task {
         isDone = done;
     }
 
-    @JsonIgnore
     public User getUser() {
         return user;
     }
@@ -81,7 +81,6 @@ public class Task {
         this.user = user;
     }
 
-    @JsonIgnore
     public Project getProject() {
         return project;
     }

@@ -57,4 +57,12 @@ public class TaskController {
         taskService.deleteTask(projectId, taskId, user.getName());
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{projectId}/tasks/{taskId}")
+    public ResponseEntity<?> setTaskDone(@PathVariable("projectId") Integer projectId,
+                                         @PathVariable("taskId") Integer taskId,
+                                         Authentication user) {
+        taskService.setTaskDone(projectId, taskId, user.getName());
+        return ResponseEntity.noContent().build();
+    }
 }
