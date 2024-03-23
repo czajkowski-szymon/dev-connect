@@ -9,7 +9,8 @@ import pl.czajkowski.devconnect.project.ProjectRepository;
 import pl.czajkowski.devconnect.project.model.Project;
 import pl.czajkowski.devconnect.task.models.AddTaskRequest;
 import pl.czajkowski.devconnect.task.models.Task;
-import pl.czajkowski.devconnect.task.models.UpdateTaskUser;
+import pl.czajkowski.devconnect.task.models.TaskDTO;
+import pl.czajkowski.devconnect.task.models.UpdateTaskRequest;
 import pl.czajkowski.devconnect.user.UserService;
 import pl.czajkowski.devconnect.user.models.User;
 
@@ -26,17 +27,21 @@ public class TaskService {
 
     private final ProjectRepository projectRepository;
 
+    private final TaskDTOMapper mapper;
+
     public TaskService(TaskRepository taskRepository,
                        UserDetailsService userDetailsService,
                        UserService userService,
-                       ProjectRepository projectRepository) {
+                       ProjectRepository projectRepository,
+                       TaskDTOMapper mapper) {
         this.taskRepository = taskRepository;
         this.userDetailsService = userDetailsService;
         this.userService = userService;
         this.projectRepository = projectRepository;
+        this.mapper = mapper;
     }
 
-    public List<Task> getAllTasksForProject(Integer projectId, String username) {
+    public List<TaskDTO> getAllTasksForProject(Integer projectId, String username) {
         User user = (User) userDetailsService.loadUserByUsername(username);
         Project project = projectRepository.findById(projectId).orElseThrow(
                 () -> new ResourceNotFoundException("Project with id: [%s] not found".formatted(projectId))
@@ -44,10 +49,13 @@ public class TaskService {
 
         validateProjectContributionOrManaging(project, user);
 
-        return taskRepository.findAllByProjectId(projectId);
+        return taskRepository.findAllByProjectId(projectId)
+                .stream()
+                .map(mapper)
+                .toList();
     }
 
-    public Task getTaskForProject(Integer projectId, Integer taskId, String username) {
+    public TaskDTO getTaskForProject(Integer projectId, Integer taskId, String username) {
         User user = (User) userDetailsService.loadUserByUsername(username);
         Project project = projectRepository.findById(projectId).orElseThrow(
                 () -> new ResourceNotFoundException("Project with id: [%s] not found".formatted(projectId))
@@ -61,12 +69,14 @@ public class TaskService {
 
         validateTaskBelongsToProject(project, task);
 
-        return taskRepository.findById(taskId).orElseThrow(
-                () -> new ResourceNotFoundException("Task with id: [%] not found")
+        return mapper.apply(
+                taskRepository.findById(taskId).orElseThrow(
+                    () -> new ResourceNotFoundException("Task with id: [%] not found")
+                )
         );
     }
 
-    public Task addTaskForProject(AddTaskRequest request, Integer projectId, String username) {
+    public TaskDTO addTaskForProject(AddTaskRequest request, Integer projectId, String username) {
 
         User projectManager = (User) userDetailsService.loadUserByUsername(username);
 
@@ -87,10 +97,10 @@ public class TaskService {
         task.setUser(user);
         task.setProject(project);
 
-        return taskRepository.save(task);
+        return mapper.apply(taskRepository.save(task));
     }
 
-    public Task updateTask(UpdateTaskUser request, Integer projectId, String username) {
+    public TaskDTO updateTask(UpdateTaskRequest request, Integer projectId, String username) {
         User projectManager = (User) userDetailsService.loadUserByUsername(username);
         Project project = projectRepository.findById(projectId).orElseThrow(
                 () -> new ResourceNotFoundException("Project with id: [%s] not found".formatted(projectId))
@@ -104,7 +114,7 @@ public class TaskService {
         task.setBody(request.body());
         task.setDeadline(request.deadline());
 
-        return taskRepository.save(task);
+        return mapper.apply(taskRepository.save(task));
     }
 
     public void deleteTask(Integer projectId, Integer taskId, String username) {

@@ -21,6 +21,9 @@ public class Task {
     @Column(nullable = false)
     private LocalDate deadline;
 
+    @Column(nullable = false)
+    private boolean isDone;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -59,6 +62,14 @@ public class Task {
 
     public void setDeadline(LocalDate deadline) {
         this.deadline = deadline;
+    }
+
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public void setDone(boolean done) {
+        isDone = done;
     }
 
     @JsonIgnore
