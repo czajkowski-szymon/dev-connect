@@ -40,13 +40,13 @@ public class User implements UserDetails {
 
     private String profileImageId;
 
-    @OneToMany(mappedBy = "projectManager")
+    @OneToMany(mappedBy = "projectManager", cascade = CascadeType.REMOVE)
     private List<Project> managedProjects;
 
     @ManyToMany(mappedBy = "contributors")
     private List<Project> contributedProjects;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Task> tasks;
 
     @Enumerated(EnumType.STRING)
