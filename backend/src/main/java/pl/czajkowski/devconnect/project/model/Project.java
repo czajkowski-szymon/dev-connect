@@ -1,9 +1,7 @@
 package pl.czajkowski.devconnect.project.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import pl.czajkowski.devconnect.task.models.Task;
-import pl.czajkowski.devconnect.technology.Technology;
 import pl.czajkowski.devconnect.user.models.User;
 
 import java.util.ArrayList;
@@ -17,25 +15,21 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
     private String projectName;
 
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "project_manager_id", nullable = false)
+    @JoinColumn(name = "project_manager_id")
     private User projectManager;
 
-    @ManyToMany(mappedBy = "contributedProjects")
-    private List<User> contributors;
-
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
-            name = "project_technology",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "technology_id")
+            name = "user_project",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_id")
     )
-    private List<Technology> technologies;
+    private List<User> contributors = new ArrayList<>();
 
     @OneToMany(mappedBy = "project")
     private List<Task> tasks;
@@ -49,7 +43,6 @@ public class Project {
         this.projectName = projectName;
         this.description = description;
         this.projectManager = projectManager;
-        this.contributors = new ArrayList<>();
     }
 
     public Integer getId() {
@@ -90,13 +83,5 @@ public class Project {
 
     public void setContributors(List<User> contributors) {
         this.contributors = contributors;
-    }
-
-    public List<Technology> getTechnologies() {
-        return technologies;
-    }
-
-    public void setTechnologies(List<Technology> technologies) {
-        this.technologies = technologies;
     }
 }

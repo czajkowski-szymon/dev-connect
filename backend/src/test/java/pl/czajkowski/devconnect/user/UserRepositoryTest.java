@@ -25,7 +25,6 @@ class UserRepositoryTest extends PostgreContainer {
                 "szymon@gmail.com",
                 "password",
                 "Szymon",
-                "github.com",
                 Role.USER,
                 false,
                 true

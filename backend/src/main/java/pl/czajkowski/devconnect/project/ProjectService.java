@@ -10,22 +10,17 @@ import pl.czajkowski.devconnect.project.model.AddProjectRequest;
 import pl.czajkowski.devconnect.project.model.Project;
 import pl.czajkowski.devconnect.project.model.ProjectDTO;
 import pl.czajkowski.devconnect.project.model.UpdateProjectRequest;
-import pl.czajkowski.devconnect.technology.Technology;
-import pl.czajkowski.devconnect.technology.TechnologyRepository;
 import pl.czajkowski.devconnect.user.UserDTOMapper;
 import pl.czajkowski.devconnect.user.UserService;
 import pl.czajkowski.devconnect.user.models.User;
 import pl.czajkowski.devconnect.user.models.UserDTO;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
-
-    private final TechnologyRepository technologyRepository;
 
     private final UserService userService;
 
@@ -36,13 +31,11 @@ public class ProjectService {
     private final UserDTOMapper userMapper;
 
     public ProjectService(ProjectRepository projectRepository,
-                          TechnologyRepository technologyRepository,
                           UserService userService,
                           UserDetailsService userDetailsService,
                           ProjectDTOMapper projectMapper,
                           UserDTOMapper userMapper) {
         this.projectRepository = projectRepository;
-        this.technologyRepository = technologyRepository;
         this.userService = userService;
         this.userDetailsService = userDetailsService;
         this.projectMapper = projectMapper;
@@ -65,14 +58,10 @@ public class ProjectService {
     public ProjectDTO addProject(AddProjectRequest request, String username) {
         User projectManager = (User) userDetailsService.loadUserByUsername(username);
 
-        Project project = new Project(
-                request.projectName(),
-                request.description(),
-                projectManager
-        );
-
-        List<Technology> technologies = mapTechnologiesToProject(request.technologies(), project);
-        project.setTechnologies(technologies);
+        Project project = new Project();
+        project.setProjectName(request.projectName());
+        project.setDescription(request.description());
+        project.setProjectManager(projectManager);
 
         return projectMapper.apply(projectRepository.save(project));
     }
@@ -108,9 +97,6 @@ public class ProjectService {
         project.setProjectName(request.projectName());
         project.setDescription(request.description());
 
-        List<Technology> technologies = mapTechnologiesToProject(request.technologies(), project);
-        project.setTechnologies(technologies);
-
         return projectMapper.apply(projectRepository.save(project));
     }
 
@@ -139,15 +125,6 @@ public class ProjectService {
         validateProjectOwnership(project, projectManager);
 
         projectRepository.deleteById(projectId);
-    }
-
-    private List<Technology> mapTechnologiesToProject(List<String> technologyNames, Project project) {
-        return technologyNames.stream()
-                .map(technologyName -> technologyRepository.findByTechnologyName(technologyName).orElseThrow(
-                        () -> new ResourceNotFoundException("Technology not found")
-                ))
-                .peek(technology -> technology.addProject(project))
-                .collect(Collectors.toList());
     }
 
     private Project getProjectById(Integer projectId) {

@@ -57,8 +57,8 @@ public class ProjectController {
 
     @DeleteMapping("/{projectId}/contributors/{userId}")
     public ResponseEntity<ProjectDTO> deleteContributor(@PathVariable("projectId") Integer projectId,
-                                               @PathVariable("userId") Integer userId,
-                                               Authentication user) {
+                                                        @PathVariable("userId") Integer userId,
+                                                        Authentication user) {
         return ResponseEntity.ok(projectService.deleteContributor(projectId, userId, user.getName()));
     }
 

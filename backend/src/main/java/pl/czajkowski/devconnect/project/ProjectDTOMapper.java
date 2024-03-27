@@ -19,8 +19,7 @@ public class ProjectDTOMapper implements Function<Project, ProjectDTO> {
                 project.getProjectName(),
                 project.getDescription(),
                 mapper.apply(project.getProjectManager()),
-                project.getContributors().stream().map(mapper).collect(Collectors.toList()),
-                project.getTechnologies()
+                project.getContributors().stream().map(mapper).collect(Collectors.toList())
         );
     }
 }

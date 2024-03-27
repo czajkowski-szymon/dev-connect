@@ -1,14 +1,11 @@
 package pl.czajkowski.devconnect.user.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import pl.czajkowski.devconnect.project.ProjectRepository;
 import pl.czajkowski.devconnect.project.model.Project;
 import pl.czajkowski.devconnect.task.models.Task;
-import pl.czajkowski.devconnect.technology.Technology;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,43 +32,24 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
     private String firstName;
-
-    private String gitUrl;
 
     private String profileImageId;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_technology",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "technology_id")
-    )
-    private List<Technology> technologies;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_project",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "project_id")
-    )
-    private List<Project> contributedProjects;
-
     @OneToMany(mappedBy = "projectManager")
-    private List<Project> managedProject;
+    private List<Project> managedProjects;
+
+    @ManyToMany(mappedBy = "contributors")
+    private List<Project> contributedProjects;
 
     @OneToMany(mappedBy = "user")
     private List<Task> tasks;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Role role;
 
     private boolean locked;
@@ -84,7 +62,6 @@ public class User implements UserDetails {
             String email,
             String password,
             String firstName,
-            String gitUrl,
             Role role,
             boolean locked,
             boolean enabled
@@ -92,7 +69,6 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
-        this.gitUrl = gitUrl;
         this.role = role;
         this.locked = locked;
         this.enabled = enabled;
@@ -126,28 +102,12 @@ public class User implements UserDetails {
         this.firstName = firstName;
     }
 
-    public String getGitUrl() {
-        return gitUrl;
-    }
-
-    public void setGitUrl(String gitUrl) {
-        this.gitUrl = gitUrl;
-    }
-
     public String getProfileImageId() {
         return profileImageId;
     }
 
     public void setProfileImageId(String profileImageId) {
         this.profileImageId = profileImageId;
-    }
-
-    public List<Technology> getTechnologies() {
-        return technologies;
-    }
-
-    public void setTechnologies(List<Technology> technologies) {
-        this.technologies = technologies;
     }
 
     public List<Project> getContributedProjects() {
@@ -158,12 +118,12 @@ public class User implements UserDetails {
         this.contributedProjects = contributedProjects;
     }
 
-    public List<Project> getManagedProject() {
-        return managedProject;
+    public List<Project> getManagedProjects() {
+        return managedProjects;
     }
 
-    public void setManagedProject(List<Project> managedProject) {
-        this.managedProject = managedProject;
+    public void setManagedProjects(List<Project> managedProjects) {
+        this.managedProjects = managedProjects;
     }
 
     public List<Task> getTasks() {
@@ -247,15 +207,14 @@ public class User implements UserDetails {
                 Objects.equals(email, user.email) &&
                 Objects.equals(password, user.password) &&
                 Objects.equals(firstName, user.firstName) &&
-                Objects.equals(gitUrl, user.gitUrl) &&
                 Objects.equals(profileImageId, user.profileImageId) &&
-                Objects.equals(technologies, user.technologies) && role == user.role;
+                role == user.role;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-                id, email, password, firstName, gitUrl, profileImageId, technologies, role, locked, enabled
+                id, email, password, firstName, profileImageId, role, locked, enabled
         );
     }
 
@@ -266,9 +225,10 @@ public class User implements UserDetails {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", firstName='" + firstName + '\'' +
-                ", gitUrl='" + gitUrl + '\'' +
                 ", profileImageId='" + profileImageId + '\'' +
-                ", technologies=" + technologies +
+                ", contributedProjects=" + contributedProjects +
+                ", managedProject=" + managedProjects +
+                ", tasks=" + tasks +
                 ", role=" + role +
                 ", locked=" + locked +
                 ", enabled=" + enabled +

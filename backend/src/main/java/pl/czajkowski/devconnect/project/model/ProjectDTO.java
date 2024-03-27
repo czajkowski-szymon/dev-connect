@@ -1,6 +1,5 @@
 package pl.czajkowski.devconnect.project.model;
 
-import pl.czajkowski.devconnect.technology.Technology;
 import pl.czajkowski.devconnect.user.models.UserDTO;
 
 import java.util.List;
@@ -10,7 +9,6 @@ public record ProjectDTO(
         String projectName,
         String description,
         UserDTO projectManager,
-        List<UserDTO> contributors,
-        List<Technology> technologies
+        List<UserDTO> contributors
 ) {
 }

@@ -13,15 +13,11 @@ import pl.czajkowski.devconnect.exception.EmailAlreadyExistsException;
 import pl.czajkowski.devconnect.exception.ResourceNotFoundException;
 import pl.czajkowski.devconnect.exception.UserNotFoundException;
 import pl.czajkowski.devconnect.s3.S3Service;
-import pl.czajkowski.devconnect.technology.Technology;
-import pl.czajkowski.devconnect.technology.TechnologyRepository;
 import pl.czajkowski.devconnect.user.models.RegistrationRequest;
 import pl.czajkowski.devconnect.user.models.Role;
 import pl.czajkowski.devconnect.user.models.User;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -35,8 +31,6 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private TechnologyRepository technologyRepository;
-    @Mock
     private PasswordEncoder encoder;
     @Mock
     private S3Service s3;
@@ -45,7 +39,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        underTest = new UserService(userRepository, technologyRepository, mapper, encoder, s3);
+        underTest = new UserService(userRepository, mapper, encoder, s3);
     }
 
     @Test
@@ -54,27 +48,21 @@ class UserServiceTest {
         RegistrationRequest request = new RegistrationRequest(
                 "john@gmail.com",
                 "password",
-                "John",
-                "github.com",
-                List.of("Java")
+                "John"
         );
 
         User user = new User(
                 "john@gmail.com",
                 "#sdawq@!/sds",
                 "John",
-                "github.com",
                 Role.USER,
                 false,
                 true
         );
 
         String hashedPassword = "#sdawq@!sds";
-        List<Technology> technologies = List.of(new Technology(1, "Java"));
         when(userRepository.existsUserByEmail(request.email())).thenReturn(false);
         when(encoder.encode(request.password())).thenReturn(hashedPassword);
-        when(technologyRepository.findByTechnologyName("Java"))
-                .thenReturn(Optional.of(new Technology(1, "Java")));
         when(userRepository.save(any())).thenReturn(user);
 
         // when
@@ -88,9 +76,7 @@ class UserServiceTest {
         assertThat(capturedUser.getEmail()).isEqualTo(request.email());
         assertThat(capturedUser.getPassword()).isEqualTo(hashedPassword);
         assertThat(capturedUser.getFirstName()).isEqualTo(request.firstName());
-        assertThat(capturedUser.getGitUrl()).isEqualTo(request.gitUrl());
         assertThat(capturedUser.getProfileImageId()).isNull();
-        assertThat(capturedUser.getTechnologies()).isEqualTo(technologies);
         assertThat(capturedUser.getRole()).isEqualTo(Role.USER);
         assertThat(capturedUser.isLocked()).isFalse();
         assertThat(capturedUser.isEnabled()).isTrue();
@@ -103,9 +89,7 @@ class UserServiceTest {
         RegistrationRequest request = new RegistrationRequest(
                 email,
                 "password",
-                "John",
-                "github.com",
-                new ArrayList<>()
+                "John"
         );
         when(userRepository.existsUserByEmail(email)).thenReturn(true);
 
@@ -123,17 +107,12 @@ class UserServiceTest {
         RegistrationRequest request = new RegistrationRequest(
                 "john@gmail.com",
                 "password",
-                "John",
-                "github.com",
-                List.of("NonExistingTech")
+                "John"
         );
 
         String hashedPassword = "#sdawq@!/sds";
-        List<Technology> technologies = List.of(new Technology(1, "NonExistingTech"));
         when(userRepository.existsUserByEmail(request.email())).thenReturn(false);
         when(encoder.encode(request.password())).thenReturn(hashedPassword);
-        when(technologyRepository.findByTechnologyName("NonExistingTech"))
-                .thenReturn(Optional.empty());
 
         // then
         assertThatThrownBy(() -> underTest.register(request))
@@ -197,7 +176,6 @@ class UserServiceTest {
                 "john@gmail.com",
                 "password",
                 "John",
-                "github.com",
                 Role.USER,
                 false,
                 true

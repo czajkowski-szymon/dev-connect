@@ -88,10 +88,9 @@ public class TaskService {
 
         validateProjectContribution(user, projectId);
 
-        Task task = new Task(
-                request.body(),
-                request.deadline()
-        );
+        Task task = new Task();
+        task.setBody(request.body());
+        task.setDeadline(request.deadline());
         task.setUser(user);
         task.setProject(project);
 
@@ -175,7 +174,7 @@ public class TaskService {
     }
 
     private boolean isUserProjectManager(User user, Integer projectId) {
-        return user.getManagedProject()
+        return user.getManagedProjects()
                 .stream()
                 .map(Project::getId)
                 .toList()

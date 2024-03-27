@@ -1,6 +1,5 @@
 package pl.czajkowski.devconnect.task.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import pl.czajkowski.devconnect.project.model.Project;
 import pl.czajkowski.devconnect.user.models.User;
@@ -15,13 +14,10 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
     private String body;
 
-    @Column(nullable = false)
     private LocalDate deadline;
 
-    @Column(nullable = false)
     private boolean isDone;
 
     @ManyToOne

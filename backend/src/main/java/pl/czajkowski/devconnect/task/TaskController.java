@@ -28,15 +28,15 @@ public class TaskController {
 
     @GetMapping("/{projectId}/tasks/{taskId}")
     public ResponseEntity<TaskDTO> getTaskForProject(@PathVariable("projectId") Integer projectId,
-                                                  @PathVariable("taskId") Integer taskId,
-                                                  Authentication user) {
+                                                     @PathVariable("taskId") Integer taskId,
+                                                     Authentication user) {
         return ResponseEntity.ok(taskService.getTaskForProject(projectId, taskId, user.getName()));
     }
 
     @PostMapping("/{projectId}/tasks")
     public ResponseEntity<TaskDTO> addTaskForProject(@RequestBody AddTaskRequest request,
-                                                  @PathVariable Integer projectId,
-                                                  Authentication user) {
+                                                     @PathVariable Integer projectId,
+                                                     Authentication user) {
         TaskDTO response = taskService.addTaskForProject(request, projectId, user.getName());
         return ResponseEntity.created(
                 URI.create("/projects/%s/tasks/".formatted(projectId) + response.id())
