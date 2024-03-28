@@ -3,10 +3,16 @@ package pl.czajkowski.devconnect.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @ControllerAdvice
 public class ApiExceptionHandler {
@@ -117,5 +123,22 @@ public class ApiExceptionHandler {
         );
 
         return new ResponseEntity<>(err, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleException(MethodArgumentNotValidException e, HttpServletRequest request) {
+        List<String> messages = new ArrayList<>();
+        e.getBindingResult().getAllErrors().forEach(error -> {
+            messages.add(error.getDefaultMessage());
+        });
+
+        ErrorResponse err = new ErrorResponse(
+                request.getRequestURI(),
+                HttpStatus.BAD_REQUEST.value(),
+                messages.toString(),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
     }
 }

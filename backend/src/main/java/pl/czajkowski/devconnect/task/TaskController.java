@@ -1,5 +1,6 @@
 package pl.czajkowski.devconnect.task;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class TaskController {
     }
 
     @PostMapping("/{projectId}/tasks")
-    public ResponseEntity<TaskDTO> addTaskForProject(@RequestBody AddTaskRequest request,
+    public ResponseEntity<TaskDTO> addTaskForProject(@Valid @RequestBody AddTaskRequest request,
                                                      @PathVariable Integer projectId,
                                                      Authentication user) {
         TaskDTO response = taskService.addTaskForProject(request, projectId, user.getName());
@@ -44,9 +45,9 @@ public class TaskController {
     }
 
     @PutMapping("/{projectId}/tasks")
-    public ResponseEntity<TaskDTO> updateTask(@RequestBody UpdateTaskRequest request,
-                                           @PathVariable Integer projectId,
-                                           Authentication user) {
+    public ResponseEntity<TaskDTO> updateTask(@Valid @RequestBody UpdateTaskRequest request,
+                                              @PathVariable Integer projectId,
+                                              Authentication user) {
         return ResponseEntity.ok(taskService.updateTask(request, projectId, user.getName()));
     }
 

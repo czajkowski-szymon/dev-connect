@@ -1,5 +1,6 @@
 package pl.czajkowski.devconnect.project;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +34,7 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<ProjectDTO> addProject(@RequestBody AddProjectRequest request, Authentication user) {
+    public ResponseEntity<ProjectDTO> addProject(@Valid @RequestBody AddProjectRequest request, Authentication user) {
         ProjectDTO response = projectService.addProject(request, user.getName());
         return ResponseEntity.created(URI.create("/projects/" + response.id())).body(response);
     }
@@ -51,7 +52,7 @@ public class ProjectController {
     }
 
     @PutMapping
-    public ResponseEntity<ProjectDTO> updateProject(@RequestBody UpdateProjectRequest request, Authentication user) {
+    public ResponseEntity<ProjectDTO> updateProject(@Valid @RequestBody UpdateProjectRequest request, Authentication user) {
         return ResponseEntity.ok(projectService.updateProject(request, user.getName()));
     }
 

@@ -1,4 +1,9 @@
 package pl.czajkowski.devconnect.auth.models;
 
-public record LoginRequest(String email, String password) {
+import jakarta.validation.constraints.NotBlank;
+
+public record LoginRequest(
+        @NotBlank(message = "email is mandatory") String email,
+        @NotBlank(message = "password is mandatory") String password
+) {
 }
