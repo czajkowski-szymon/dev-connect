@@ -112,10 +112,10 @@ public class ProjectService {
                 .orElseThrow(
                         () -> new UserNotFoundException("User with id: %s is not contributor of this project")
                 );
-
+        contributor.getContributedProjects().remove(project);
         project.getContributors().remove(contributor);
-        projectRepository.deleteContributor(userId, projectId);
-        return projectMapper.apply(project);
+
+        return projectMapper.apply(projectRepository.save(project));
     }
 
     public void deleteProject(Integer projectId, String username) {
