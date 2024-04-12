@@ -102,27 +102,6 @@ class UserServiceTest {
     }
 
     @Test
-    void shouldThrowForNonExistingTechnology() {
-        // given
-        RegistrationRequest request = new RegistrationRequest(
-                "john@gmail.com",
-                "password",
-                "John"
-        );
-
-        String hashedPassword = "#sdawq@!/sds";
-        when(userRepository.existsUserByEmail(request.email())).thenReturn(false);
-        when(encoder.encode(request.password())).thenReturn(hashedPassword);
-
-        // then
-        assertThatThrownBy(() -> underTest.register(request))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Technology not found");
-
-        verify(userRepository, never()).save(any());
-    }
-
-    @Test
     void shouldUploadProfileImage() {
         int id = 1;
         byte[] bytes = "Hello".getBytes();

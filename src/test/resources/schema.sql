@@ -1,36 +1,60 @@
-create table technology
-(
-    id              serial
-        primary key,
-    technology_name varchar(255) not null
-);
-
 create table user_
 (
     id               serial
         primary key,
-    email            varchar(255) not null
+    email            varchar(255)
         constraint user_email_unique
             unique,
-    enabled          boolean      not null,
-    first_name       varchar(255) not null,
-    git_url       varchar(255),
-    locked           boolean      not null,
-    password         varchar(255) not null,
+    enabled          boolean not null,
+    first_name       varchar(255),
+    locked           boolean not null,
+    password         varchar(255),
     profile_image_id varchar(255)
         constraint profile_image_id_unique
             unique,
-    role             smallint     not null
+    role             varchar(255)
         constraint user__role_check
-            check ((role >= 0) AND (role <= 1))
+            check ((role)::text = ANY ((ARRAY ['USER'::character varying, 'ADMIN'::character varying])::text[]))
+    );
+
+create table project
+(
+    id                 serial
+        primary key,
+    description        varchar(255),
+    project_name       varchar(255),
+    project_manager_id integer
+        constraint fkpaaciy8iaxjvhhxtx5eksrn7f
+            references user_
+            on update cascade on delete cascade
 );
 
-create table user_technology
+create table task
 (
-    user_id       integer not null
-        constraint fkaag32n7d2ygf7apraoyi1710n
-            references user_,
-    technology_id integer not null
-        constraint fkbqkmd2ids232jtc526g3jxijh
-            references technology
+    id         serial
+        primary key,
+    body       varchar(255),
+    deadline   date,
+    is_done    boolean not null,
+    project_id integer
+        constraint fkk8qrwowg31kx7hp93sru1pdqa
+            references project
+            on update cascade on delete cascade,
+    user_id    integer
+        constraint fk6uc2pbxr1jfrgqtxlefkcshil
+            references user_
+            on update cascade on delete set null
 );
+
+create table user_project
+(
+    user_id    integer not null
+        constraint fk9fphmq6fwsavmphyn3qgi2qol
+            references project
+            on update cascade on delete cascade,
+    project_id integer not null
+        constraint fk6ow7l7mg8e7gp1ss10xn5ij2o
+            references user_
+            on update cascade on delete cascade
+);
+

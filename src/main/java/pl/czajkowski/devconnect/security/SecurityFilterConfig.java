@@ -8,7 +8,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import pl.czajkowski.devconnect.user.models.Role;
 
 @Configuration
 @EnableWebSecurity
@@ -20,7 +19,12 @@ public class SecurityFilterConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         auth -> auth
-                            .requestMatchers("/api/users/register", "/api/auth/login").permitAll()
+                            .requestMatchers(
+                                    "/api/users/register",
+                                    "/api/auth/login",
+                                    "/v3/api-docs/**",
+                                    "/swagger-ui/**"
+                            ).permitAll()
                             .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(

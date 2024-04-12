@@ -13,19 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(
-        name = "user_",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "user_email_unique",
-                        columnNames = "email"
-                ),
-                @UniqueConstraint(
-                        name = "profile_image_id_unique",
-                        columnNames = "profile_image_id"
-                ),
-        }
-)
+@Table(name = "user_")
 public class User implements UserDetails {
 
     @Id
