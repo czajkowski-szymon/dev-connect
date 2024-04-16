@@ -25,6 +25,7 @@ public class SecurityFilterConfig {
                                     "/v3/api-docs/**",
                                     "/swagger-ui/**"
                             ).permitAll()
+                                .requestMatchers("/api/admin/**").hasAuthority("SCOPE_ADMIN")
                             .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(

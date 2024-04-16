@@ -26,8 +26,8 @@ public class Project {
     @ManyToMany
     @JoinTable(
             name = "user_project",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "project_id")
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> contributors = new ArrayList<>();
 

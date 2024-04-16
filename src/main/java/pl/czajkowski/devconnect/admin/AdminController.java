@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.czajkowski.devconnect.exception.ErrorResponse;
 
@@ -37,8 +37,8 @@ public class AdminController {
             }
     )
     @PatchMapping("users/block/{userId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> lockUser(@PathVariable Integer userId) {
+    public ResponseEntity<?> lockUser(@PathVariable Integer userId, Authentication user) {
+        System.out.println(user.getDetails());
         adminService.lockUser(userId);
         return ResponseEntity.noContent().build();
     }
@@ -59,7 +59,6 @@ public class AdminController {
             }
     )
     @DeleteMapping("users/{userId}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable Integer userId) {
         adminService.deleteUser(userId);
         return ResponseEntity.noContent().build();

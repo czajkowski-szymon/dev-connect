@@ -43,7 +43,7 @@ public class UserService {
         user.setEmail(request.email());
         user.setPassword(encoder.encode(request.password()));
         user.setFirstName(request.firstName());
-        user.setRole(Role.USER);
+        user.setRole(Role.ADMIN);
         user.setLocked(false);
         user.setEnabled(true);
 

@@ -74,7 +74,7 @@ public class TaskController {
     @Operation(
             summary = "Add task for project",
             responses = {
-                    @ApiResponse(description = "Success", responseCode = "200"),
+                    @ApiResponse(description = "Success", responseCode = "201"),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
                     @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content(
                                     schema = @Schema(implementation = ErrorResponse.class)
@@ -144,7 +144,7 @@ public class TaskController {
     @Operation(
             summary = "Set task as done",
             responses = {
-                    @ApiResponse(description = "Success", responseCode = "200"),
+                    @ApiResponse(description = "Success", responseCode = "204"),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
                     @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content(
                                     schema = @Schema(implementation = ErrorResponse.class)
