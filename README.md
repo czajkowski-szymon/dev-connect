@@ -13,10 +13,10 @@
 
 ## Technologies
 
-- Spring Boot
-- PostgreSQL
-- Docker
-- Amazon S3
+- Spring Boot <img src="https://www.vectorlogo.zone/logos/springio/springio-icon.svg" alt="spring" width="20" height="20"/>
+- PostgreSQL <img src="https://www.vectorlogo.zone/logos/postgresql/postgresql-icon.svg" alt="postgresql" width="20" height="20"/>
+- Docker <img src="https://www.vectorlogo.zone/logos/docker/docker-tile.svg" alt="docker" width="20" height="20"/>
+- Amazon S3 <img src="https://www.vectorlogo.zone/logos/amazon_aws/amazon_aws-icon.svg" alt="aws" width="20" height="20"/>
 
 ## Features
 
