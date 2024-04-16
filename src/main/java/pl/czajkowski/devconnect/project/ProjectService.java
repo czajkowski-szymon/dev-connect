@@ -48,8 +48,8 @@ public class ProjectService {
         );
     }
 
-    public List<ProjectDTO> getAllProjectManagedByUser(Integer userId, String username) {
-        User user = (User) userDetailsService.loadUserByUsername(username);
+    public List<ProjectDTO> getAllProjectManagedByUser(Integer userId) {
+        User user = userService.getUserById(userId);
         return projectRepository.findByProjectManager(user).stream()
                 .map(projectMapper)
                 .toList();

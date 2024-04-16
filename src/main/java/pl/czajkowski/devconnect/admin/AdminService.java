@@ -23,7 +23,6 @@ public class AdminService {
     }
 
     public void deleteUser(Integer userId) {
-        
         userRepository.deleteById(userId);
     }
 }
