@@ -1,4 +1,4 @@
-create table user_
+create table if not exists public.user_
 (
     id               serial
         primary key,
@@ -15,9 +15,12 @@ create table user_
     role             varchar(255)
         constraint user__role_check
             check ((role)::text = ANY ((ARRAY ['USER'::character varying, 'ADMIN'::character varying])::text[]))
-    );
+);
 
-create table project
+-- alter table public.user_
+--     owner to root;
+
+create table if not exists public.project
 (
     id                 serial
         primary key,
@@ -25,11 +28,14 @@ create table project
     project_name       varchar(255),
     project_manager_id integer
         constraint fkpaaciy8iaxjvhhxtx5eksrn7f
-            references user_
+            references public.user_
             on update cascade on delete cascade
 );
 
-create table task
+-- alter table public.project
+--     owner to root;
+
+create table if not exists public.task
 (
     id         serial
         primary key,
@@ -38,23 +44,28 @@ create table task
     is_done    boolean not null,
     project_id integer
         constraint fkk8qrwowg31kx7hp93sru1pdqa
-            references project
+            references public.project
             on update cascade on delete cascade,
     user_id    integer
         constraint fk6uc2pbxr1jfrgqtxlefkcshil
-            references user_
+            references public.user_
             on update cascade on delete set null
 );
 
-create table user_project
+-- alter table public.task
+--     owner to root;
+
+create table if not exists public.user_project
 (
     user_id    integer not null
         constraint fk9fphmq6fwsavmphyn3qgi2qol
-            references project
+            references public.project
             on update cascade on delete cascade,
     project_id integer not null
         constraint fk6ow7l7mg8e7gp1ss10xn5ij2o
-            references user_
+            references public.user_
             on update cascade on delete cascade
 );
 
+-- alter table public.user_project
+--     owner to root;

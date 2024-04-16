@@ -9,8 +9,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>pl.czajkowski</groupId>
-	<artifactId>devconnect</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>devconnect-api</artifactId>
+	<version>1.0.0</version>
 	<name>devconnect</name>
 	<description>Application that helps connect developers</description>
 	<properties>

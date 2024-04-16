@@ -8,6 +8,6 @@ public abstract class PostgreContainer {
 
     @Container
     @ServiceConnection
-    static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:16.0");
+    static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres");
 
 }

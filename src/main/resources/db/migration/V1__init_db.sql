@@ -17,8 +17,8 @@ create table if not exists public.user_
             check ((role)::text = ANY ((ARRAY ['USER'::character varying, 'ADMIN'::character varying])::text[]))
 );
 
-alter table public.user_
-    owner to root;
+-- alter table public.user_
+--     owner to root;
 
 create table if not exists public.project
 (
@@ -32,8 +32,8 @@ create table if not exists public.project
             on update cascade on delete cascade
 );
 
-alter table public.project
-    owner to root;
+-- alter table public.project
+--     owner to root;
 
 create table if not exists public.task
 (
@@ -52,8 +52,8 @@ create table if not exists public.task
             on update cascade on delete set null
 );
 
-alter table public.task
-    owner to root;
+-- alter table public.task
+--     owner to root;
 
 create table if not exists public.user_project
 (
@@ -67,6 +67,5 @@ create table if not exists public.user_project
             on update cascade on delete cascade
 );
 
-alter table public.user_project
-    owner to root;
-
+-- alter table public.user_project
+--     owner to root;

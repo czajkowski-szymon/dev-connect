@@ -9,9 +9,23 @@ services:
       - 'POSTGRES_PASSWORD=root'
       - 'POSTGRES_USER=root'
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - devconnect-database:/var/lib/postgres/data
+    networks:
+      - devconnect-network
+
+  api:
+    container_name: api
+    image: devconnect-api
+    ports:
+      - "8080:8080"
+    networks:
+      - devconnect-network
 
 volumes:
   devconnect-database:
+
+networks:
+  devconnect-network:
+    driver: bridge
