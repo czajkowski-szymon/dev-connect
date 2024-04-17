@@ -39,7 +39,7 @@ git clone https://github.com/czajkowski-szymon/dev-connect.git
 ### Step 2: Package application with Maven
 
 ```bash
-mvnw clean package
+./mvnw clean package
 ```
 
 ### Step 3: Run docker containers
