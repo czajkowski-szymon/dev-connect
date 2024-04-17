@@ -4,12 +4,9 @@
 
 ## Table of Contents
 
-- [About](#about)
 - [Technologies](#technologies)
 - [Features](#features)
 - [Instructions](#instructions)
-
-## About
 
 ## Technologies
 
