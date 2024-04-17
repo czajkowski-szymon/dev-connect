@@ -25,7 +25,7 @@
 - Authentication with JWT
 - Creating, updating, deleting projects
 - Adding contributors to projects
-- Assigning tasks for contributors
+- Assigning tasks to contributors
 - Admin users can block and delete regular user accounts
 
 ## Instructions
